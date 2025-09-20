@@ -67,13 +67,48 @@
             overflow-y: auto;
             box-shadow: 0 25px 50px -12px rgb(0 0 0 / 0.25);
         }
+
+        /* Styles for the floating recording controls */
+        #recording-controls.active {
+            position: fixed;
+            bottom: 2rem;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 60;
+            background: rgba(255, 255, 255, 0.9);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            padding: 1rem 1.5rem;
+            border-radius: 9999px;
+            box-shadow: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1);
+            border: 1px solid rgba(226, 232, 240, 0.8);
+            
+            /* Horizontal layout */
+            flex-direction: row;
+            gap: 1.5rem;
+            align-items: center;
+            width: auto;
+        }
+
+        #recording-controls.active #timer {
+            font-size: 2.25rem; /* A bit smaller for the bar */
+            margin: 0;
+        }
+        
+        #recording-controls.active #record-btn {
+            width: auto;
+            padding: 0.75rem 2rem;
+            font-size: 1.125rem;
+            margin: 0;
+        }
+
     </style>
 </head>
 <body class="bg-slate-50 text-slate-800 flex items-center justify-center min-h-screen p-4">
 
     <div id="overlay"></div>
 
-    <div class="w-full max-w-5xl mx-auto bg-white rounded-2xl shadow-lg p-6 md:p-8">
+    <div class="w-full max-w-5xl mx-auto bg-white rounded-2xl shadow-lg p-6 md:p-8 relative">
         <header class="text-center mb-6">
             <h1 class="text-4xl font-bold text-slate-900">Reproduction Practice</h1>
             <p class="text-slate-500 mt-2 text-lg">Topic: Nelson Mandela</p>
@@ -111,10 +146,12 @@
             <div class="space-y-6">
                 <div class="bg-slate-100 rounded-lg p-6 flex flex-col items-center justify-center space-y-4">
                     <div id="status" class="text-xl font-medium text-slate-600">Press "Start" to begin</div>
-                    <div id="timer" class="text-5xl font-bold text-sky-600">2:00</div>
-                    <button id="record-btn" class="px-10 py-4 bg-sky-600 text-white font-bold text-lg rounded-full shadow-lg hover:bg-sky-700 transition-all duration-300 w-48 text-center">
-                        Start
-                    </button>
+                     <div id="recording-controls" class="flex flex-col items-center justify-center space-y-4 w-full transition-all duration-300">
+                        <div id="timer" class="text-5xl font-bold text-sky-600">2:00</div>
+                        <button id="record-btn" class="px-10 py-4 bg-sky-600 text-white font-bold text-lg rounded-full shadow-lg hover:bg-sky-700 transition-all duration-300 w-48 text-center">
+                            Start
+                        </button>
+                    </div>
                 </div>
 
                 <!-- Results Section -->
@@ -143,7 +180,7 @@
         </div>
     </div>
 
-    <script>
+    <script type="module">
         // DOM Elements
         const recordBtn = document.getElementById('record-btn');
         const statusEl = document.getElementById('status');
@@ -162,6 +199,8 @@
         const timeSlider = document.getElementById('time-slider');
         const timeDisplay = document.getElementById('time-display');
         const overlay = document.getElementById('overlay');
+        const recordingControls = document.getElementById('recording-controls');
+
 
         // Speech Recognition Setup
         const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
@@ -200,7 +239,7 @@
             ["1999", "stepped down", "received", "including", "1993", "A giant statue", "where", "was released", "died", "2013"]
         ];
         const allKeywords = keywordGroups.flat();
-        
+
         function createKeywordTag(keyword) {
             const tag = document.createElement('span');
             tag.textContent = keyword;
@@ -335,6 +374,8 @@
 
                 overlay.classList.add('show');
                 keywordsSection.classList.add('zoomed');
+                recordingControls.classList.add('active');
+
 
                 mediaRecorder = new MediaRecorder(stream);
                 mediaRecorder.start();
@@ -363,6 +404,8 @@
 
             overlay.classList.remove('show');
             keywordsSection.classList.remove('zoomed');
+            recordingControls.classList.remove('active');
+
             
             mediaRecorder.stop();
             recognition.stop();
